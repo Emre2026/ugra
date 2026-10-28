@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1f5c4a">
+<title>Uğra Panel</title>
+<link rel="stylesheet" href="panel.css?v=2">
+</head>
+<body>
+
+<!-- Sign-in -->
+<div id="login" class="center" hidden>
+  <form class="box" id="login-form">
+    <div class="brand">Uğra</div>
+    <h1>Firma paneli</h1>
+    <p>Randevularını, hizmetlerini ve ekibini buradan yönet.</p>
+    <label for="l-code">Firma kodu</label>
+    <input id="l-code" autocomplete="organization" required>
+    <label for="l-user">Kullanıcı adı</label>
+    <input id="l-user" autocomplete="username" autocapitalize="none" required>
+    <label for="l-pass">Şifre</label>
+    <input id="l-pass" type="password" autocomplete="current-password" required>
+    <button class="btn main wide" type="submit">Giriş yap</button>
+    <div class="error" id="login-error"></div>
+  </form>
+</div>
+
+<!-- First sign-in: pick your own password -->
+<div id="password" class="center" hidden>
+  <form class="box" id="password-form">
+    <div class="brand">Uğra</div>
+    <h1>Yeni şifre belirle</h1>
+    <p>Hesabına başka biri şifre verdi. Devam etmeden önce kendi şifreni seç.</p>
+    <label for="p-old">Şu anki şifre</label>
+    <input id="p-old" type="password" autocomplete="current-password" required>
+    <label for="p-new">Yeni şifre</label>
+    <input id="p-new" type="password" autocomplete="new-password" required>
+    <label for="p-new2">Yeni şifre (tekrar)</label>
+    <input id="p-new2" type="password" autocomplete="new-password" required>
+    <button class="btn main wide" type="submit">Kaydet</button>
+    <button class="btn wide" type="button" data-logout>Çıkış yap</button>
+    <div class="error" id="password-error"></div>
+  </form>
+</div>
+
+<!-- The panel -->
+<div id="app" hidden>
+  <header class="top">
+    <div class="top-in">
+      <div class="name"><span id="biz-name"></span><small id="me-name"></small></div>
+      <select id="branch" aria-label="Şube"></select>
+      <button class="btn small" data-logout>Çıkış</button>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="calendar">Takvim</button>
+      <button data-tab="services">Hizmetler</button>
+      <button data-tab="hours">Saatler</button>
+      <button data-tab="team" data-manager>Ekip</button>
+      <button data-tab="share">Paylaş</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="tab-calendar" hidden>
+      <div class="bar">
+        <button class="btn small" id="day-prev" aria-label="Önceki gün">‹</button>
+        <button class="btn small" id="day-today">Bugün</button>
+        <button class="btn small" id="day-next" aria-label="Sonraki gün">›</button>
+        <input type="date" id="day-pick" aria-label="Gün">
+        <strong id="day-title"></strong>
+        <span class="grow"></span>
+        <button class="btn" id="walk-in">Sıraya ekle</button>
+        <button class="btn main" id="new-appt">Yeni randevu</button>
+      </div>
+      <div class="stats" id="day-stats"></div>
+      <div class="cal-wrap"><div class="cal" id="cal"></div></div>
+      <div class="cancelled-list" id="cancelled"></div>
+    </section>
+
+    <section id="tab-services" hidden>
+      <div class="card">
+        <div class="bar"><h2 class="grow" style="margin:0">Hizmetler</h2><button class="btn main small" id="add-service" data-manager>Hizmet ekle</button></div>
+        <div class="list" id="services"></div>
+      </div>
+    </section>
+
+    <section id="tab-hours" hidden>
+      <div class="card">
+        <div class="bar">
+          <h2 class="grow" style="margin:0">Haftalık çalışma saatleri</h2>
+          <select id="hours-staff" style="width:auto" aria-label="Kişi"></select>
+        </div>
+        <div class="week" id="week"></div>
+        <div class="bar" style="margin:14px 0 0"><span class="grow muted" id="hours-note"></span><button class="btn main" id="save-hours">Kaydet</button></div>
+      </div>
+      <div class="card">
+        <div class="bar"><h2 class="grow" style="margin:0">İzinler</h2><button class="btn small" id="add-off">İzin ekle</button></div>
+        <div class="list" id="offs"></div>
+      </div>
+    </section>
+
+    <section id="tab-team" hidden>
+      <div class="card">
+        <div class="bar"><h2 class="grow" style="margin:0">Ekip</h2><button class="btn main small" id="add-staff">Kişi ekle</button></div>
+        <div class="list" id="team"></div>
+      </div>
+    </section>
+
+    <section id="tab-share" hidden>
+      <div class="card">
+        <h2>Randevu sayfan</h2>
+        <div class="share">
+          <div class="qr" id="qr"></div>
+          <div>
+            <p style="margin:0">Müşterilerin bu bağlantıdan uygulama indirmeden randevu alır. Instagram profiline, Google işletme sayfana ya da WhatsApp durumuna koyabilirsin. QR kodu yazdırıp tezgaha ya da aynaya yapıştır.</p>
+            <div class="link" id="share-link"></div>
+            <div class="bar" style="justify-content:inherit">
+              <button class="btn main" id="copy-link">Bağlantıyı kopyala</button>
+              <a class="btn" id="wa-link" target="_blank" rel="noopener">WhatsApp'ta paylaş</a>
+              <button class="btn" id="qr-download">QR indir</button>
+              <a class="btn" id="open-link" target="_blank" rel="noopener">Sayfayı aç</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlg"><form class="dlg" id="dlg-body" method="dialog"></form></dialog>
+
+<script src="../config.js?v=2"></script>
+<script src="qrcode.js"></script>
+<script src="panel.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uğra</title>
+<script>
+  // GitHub Pages has no server routes: /ugra/r/berber-adi comes here and goes on to the booking page
+  (function () {
+    var parts = location.pathname.split("/").filter(Boolean);
+    var at = parts.indexOf("r");
+    if (at >= 0 && parts[at + 1]) {
+      var base = "/" + parts.slice(0, at).join("/") + (at ? "/" : "");
+      location.replace(base + "r/?s=" + encodeURIComponent(decodeURIComponent(parts[at + 1])) + location.hash);
+    }
+  })();
+</script>
+</head>
+<body style="font-family:system-ui,sans-serif;padding:24px">
+<h1>Sayfa bulunamadı</h1>
+<p>Bağlantı yanlış ya da eski olabilir. <a href="/ugra/">Uğra ana sayfası</a></p>
+</body>
+</html>
