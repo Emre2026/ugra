@@ -4,10 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Uğra</title>
+<script src="/ugra/config.js?v=3"></script>
 <script>
-  // GitHub Pages has no server routes: /ugra/r/berber-adi comes here and goes on to the booking page
+  // GitHub Pages has no server routes. Two kinds of addresses come here:
+  //   /ugra/r/berber-adi   -> the booking page
+  //   /ugra/m/ABC123       -> a table QR card: on to the Uğra server's page for that table (config.js says where the
+  //                           server is today, so printed cards keep working when it moves)
   (function () {
     var parts = location.pathname.split("/").filter(Boolean);
+    var table = parts.indexOf("m");
+    if (table >= 0 && /^[A-Za-z0-9]{6}$/.test(parts[table + 1] || "")) {
+      var api = ((window.UGRA && window.UGRA.api) || "").replace(/\/+$/, "");
+      if (api) location.replace(api + "/m/" + parts[table + 1].toUpperCase());
+      return;
+    }
+
     var at = parts.indexOf("r");
     if (at >= 0 && parts[at + 1]) {
       var base = "/" + parts.slice(0, at).join("/") + (at ? "/" : "");

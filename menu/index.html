@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Menü · Uğra</title>
+    <meta name="description" content="Güncel menü, fiyatlar ve kampanyalar.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="top">
+        <div class="top-inner">
+            <a class="brand" href="../"><span class="brand-text">Uğra</span></a>
+            <nav><span id="venue-name"></span></nav>
+        </div>
+    </header>
+
+    <main class="menu-page">
+        <h1 id="title">Menü</h1>
+        <div class="notice is-table" id="table-hint" hidden></div>
+
+        <div class="app-cta">
+            <div>
+                <strong>Masadan sipariş ver, puan kazan</strong>
+                <div class="muted">Uğra uygulamasıyla siparişini telefondan ver; her harcamanda XP ve puan kazan.</div>
+            </div>
+            <a class="button" id="store-link" href="../indir.html">Uygulamayı indir</a>
+        </div>
+
+        <div id="status"></div>
+
+        <div id="menu" hidden>
+            <div id="notices"></div>
+            <div class="menu-tools">
+                <input id="search" type="search" placeholder="Menüde ara (ör. latte)" autocomplete="off">
+                <div class="chips" id="chips"></div>
+            </div>
+            <div id="items"></div>
+            <p class="muted small center">Fiyatlar anlık olarak mekandan gelir. Alerjen bilgisi için garsona danışabilirsin.</p>
+        </div>
+    </main>
+
+    <script src="../config.js?v=3"></script>
+    <script src="menu.js?v=1"></script>
+</body>
+</html>
