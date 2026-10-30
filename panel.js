@@ -63,6 +63,15 @@
     team: []
   };
 
+  // Opened inside the Uğra Firma app: the app hands over its sign-in after "#t=" and is told about "Çıkış"
+  const embedded = window.parent !== window;
+  const handedToken = new URLSearchParams(location.hash.slice(1)).get("t");
+  if (handedToken) {
+    state.token = handedToken;
+    store.set("token", handedToken);
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+
   const isManager = () => state.me && (state.me.role === "Owner" || state.me.role === "Manager");
   const isOwner = () => state.me && state.me.role === "Owner";
   const base = () => `/api/branches/${state.branch.id}`;
@@ -98,10 +107,11 @@
   // ---------- Screens: sign-in and password ----------
 
   function show(screen) {
-    for (const id of ["login", "password", "app"]) $(id).hidden = id !== screen;
+    for (const id of ["login", "activate", "password", "app"]) $(id).hidden = id !== screen;
   }
 
   function signOut(message) {
+    if (embedded && state.token) window.parent.postMessage("ugra-logout", "*");
     state.token = null;
     state.me = null;
     store.set("token", null);
@@ -130,6 +140,61 @@
       button.disabled = false;
     }
   });
+
+  // ---------- New firm: the code from Uğra opens the owner's account ----------
+
+  let license = null;
+  const KIND_NAME = { Cafe: "Kafe", Restaurant: "Restoran", Barber: "Berber", HairSalon: "Kuaför", Other: "İşletme" };
+
+  $("to-activate").addEventListener("click", () => { license = null; drawActivate(); show("activate"); });
+  $("a-back").addEventListener("click", () => show("login"));
+
+  function drawActivate() {
+    $("a-step-code").hidden = !!license;
+    $("a-step-account").hidden = !license;
+    $("activate-error").textContent = "";
+    if (license) {
+      $("a-firm").innerHTML = `<b>${esc(license.businessName)}</b><small>${KIND_NAME[license.kind] || ""}${license.city ? " · " + esc(license.city) : ""} · firma kodu <strong>${esc(license.businessCode)}</strong></small>`;
+      $("a-branch").value = license.businessName;
+      $("a-city").value = license.city || "";
+    }
+  }
+
+  $("activate-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    $("activate-error").textContent = "";
+    const button = e.submitter;
+    button.disabled = true;
+    try {
+      if (!license) {
+        license = await api("GET", "/api/activate/" + encodeURIComponent($("a-code").value.trim()));
+        drawActivate();
+        return;
+      }
+      if ($("a-pass").value !== $("a-pass2").value) throw new Error("İki şifre aynı değil.");
+      const session = await api("POST", "/api/activate", {
+        licenseCode: $("a-code").value.trim(),
+        ownerName: $("a-name").value.trim(),
+        userName: $("a-user").value.trim(),
+        password: $("a-pass").value,
+        branchName: $("a-branch").value.trim(),
+        branchKind: license.kind,
+        city: $("a-city").value.trim() || null,
+        address: null,
+        phone: $("a-phone").value.trim() || null
+      });
+      store.set("code", license.businessCode);
+      store.set("user", $("a-user").value.trim());
+      $("activate-form").reset();
+      await signedIn(session);
+      toast(`Hoş geldin! Firma kodun: ${license.businessCode}`);
+    } catch (err) {
+      $("activate-error").textContent = err.message;
+    } finally {
+      button.disabled = false;
+    }
+  });
+  $("a-change").addEventListener("click", () => { license = null; drawActivate(); });
 
   $("password-form").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -161,9 +226,23 @@
     $("me-name").textContent = state.me.fullName + " · " + ROLE[state.me.role];
     document.querySelectorAll("[data-manager]").forEach((el) => (el.hidden = !isManager()));
 
+    // The booking panel is for barbers and salons; a firm's cafe branches run in Uğra Firma's cafe screens
     const all = await api("GET", "/api/branches");
-    state.branches = all.filter((b) => b.isActive && (state.me.branchId == null || b.id === state.me.branchId));
-    if (!state.branches.length) { show("app"); $("cal").innerHTML = ""; toast("Açık bir şuben yok."); return; }
+    const mine = all.filter((b) => b.isActive && (state.me.branchId == null || b.id === state.me.branchId));
+    state.branches = mine.filter((b) => b.kind !== "Cafe" && b.kind !== "Restaurant");
+    if (!state.branches.length) {
+      show("app");
+      $("cal").innerHTML = "";
+      document.querySelectorAll("main > section").forEach((s) => (s.hidden = true));
+      $("no-booking").hidden = false;
+      $("no-booking-text").textContent = mine.length
+        ? "Bu firmanın şubeleri kafe ya da restoran. Masa, sipariş ve kasa ekranları Uğra Firma uygulamasında; aynı firma koduyla oradan giriş yap."
+        : "Açık bir şuben yok.";
+      $("tabs").hidden = true;
+      return;
+    }
+    $("no-booking").hidden = true;
+    $("tabs").hidden = false;
 
     const saved = Number(store.get("branch"));
     state.branch = state.branches.find((b) => b.id === saved)

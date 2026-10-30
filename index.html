@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#13203F">
 <title>Uğra Panel</title>
 <link rel="stylesheet" href="../lib/bootstrap-icons.min.css">
-<link rel="stylesheet" href="panel.css?v=4">
+<link rel="stylesheet" href="panel.css?v=5">
 </head>
 <body>
 
@@ -24,6 +24,46 @@
     <input id="l-pass" type="password" autocomplete="current-password" required>
     <button class="btn main wide" type="submit">Giriş yap</button>
     <div class="error" id="login-error"></div>
+    <div class="create-account">
+      <span>Uğra'dan hesap açma kodu mu aldın?</span>
+      <button class="btn wide" type="button" id="to-activate"><i class="bi bi-key"></i>Hesap oluştur</button>
+    </div>
+  </form>
+</div>
+
+<!-- New firm: the code from Uğra, then the owner's account -->
+<div id="activate" class="center" hidden>
+  <form class="box" id="activate-form">
+    <div class="brand"><span class="u-wordmark" aria-label="Uğra">u<span class="g">g</span>ra</span></div>
+    <h1>Hesap oluştur</h1>
+    <div id="a-step-code">
+      <p>Uğra'dan aldığın hesap açma kodunu yaz. Kod tek kullanımlıktır.</p>
+      <label for="a-code">Hesap açma kodu</label>
+      <input id="a-code" autocomplete="off" autocapitalize="characters" placeholder="UGRA-XXXX-XXXX-XXXX">
+      <button class="btn main wide" type="submit">Devam</button>
+    </div>
+    <div id="a-step-account" hidden>
+      <div class="a-firm" id="a-firm"></div>
+      <p class="small">Bu hesap işletme sahibinin hesabıdır. Çalışanlarını sonra Ekip bölümünden eklersin.</p>
+      <label for="a-name">Adın soyadın</label>
+      <input id="a-name" autocomplete="name" maxlength="80">
+      <label for="a-user">Kullanıcı adı</label>
+      <input id="a-user" autocomplete="username" autocapitalize="none" maxlength="40">
+      <div class="row">
+        <div><label for="a-pass">Şifre</label><input id="a-pass" type="password" autocomplete="new-password"></div>
+        <div><label for="a-pass2">Şifre (tekrar)</label><input id="a-pass2" type="password" autocomplete="new-password"></div>
+      </div>
+      <label for="a-branch">Dükkânın adı (müşteriler bunu görür)</label>
+      <input id="a-branch" maxlength="80">
+      <div class="row">
+        <div><label for="a-city">Şehir</label><input id="a-city" maxlength="60"></div>
+        <div><label for="a-phone">Telefon</label><input id="a-phone" type="tel" maxlength="30"></div>
+      </div>
+      <button class="btn main wide" type="submit">Hesabı aç ve gir</button>
+      <button class="btn wide" type="button" id="a-change">Kodu değiştir</button>
+    </div>
+    <div class="error" id="activate-error"></div>
+    <button class="btn wide" type="button" id="a-back">Hesabım var, giriş yap</button>
   </form>
 </div>
 
@@ -69,6 +109,11 @@
   </header>
 
   <main>
+    <div class="card" id="no-booking" hidden>
+      <h2><i class="bi bi-cup-hot"></i> Randevu şubesi yok</h2>
+      <p class="muted m0" id="no-booking-text"></p>
+    </div>
+
     <section id="tab-today" hidden>
       <div class="today-head">
         <div class="grow">
@@ -201,6 +246,6 @@
 
 <script src="../config.js?v=2"></script>
 <script src="qrcode.js"></script>
-<script src="panel.js?v=4"></script>
+<script src="panel.js?v=6"></script>
 </body>
 </html>
