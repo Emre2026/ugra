@@ -3,10 +3,204 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Uğra</title>
-<meta http-equiv="refresh" content="0; url=panel/">
+<meta name="theme-color" content="#13203F">
+<title>Uğra Panel</title>
+<link rel="stylesheet" href="../lib/bootstrap-icons.min.css">
+<link rel="stylesheet" href="panel.css?v=4">
 </head>
-<body style="font-family:system-ui,sans-serif;padding:24px">
-<p>Uğra firma paneline gidiliyor… <a href="panel/">Panel</a></p>
+<body>
+
+<!-- Sign-in -->
+<div id="login" class="center" hidden>
+  <form class="box" id="login-form">
+    <div class="brand"><span class="u-wordmark" aria-label="Uğra">u<span class="g">g</span>ra</span></div>
+    <h1>Firma paneli</h1>
+    <p>Randevularını, hizmetlerini ve ekibini buradan yönet.</p>
+    <label for="l-code">Firma kodu</label>
+    <input id="l-code" autocomplete="organization" required>
+    <label for="l-user">Kullanıcı adı</label>
+    <input id="l-user" autocomplete="username" autocapitalize="none" required>
+    <label for="l-pass">Şifre</label>
+    <input id="l-pass" type="password" autocomplete="current-password" required>
+    <button class="btn main wide" type="submit">Giriş yap</button>
+    <div class="error" id="login-error"></div>
+  </form>
+</div>
+
+<!-- First sign-in: pick your own password -->
+<div id="password" class="center" hidden>
+  <form class="box" id="password-form">
+    <div class="brand"><span class="u-wordmark" aria-label="Uğra">u<span class="g">g</span>ra</span></div>
+    <h1>Yeni şifre belirle</h1>
+    <p>Hesabına başka biri şifre verdi. Devam etmeden önce kendi şifreni seç.</p>
+    <label for="p-old">Şu anki şifre</label>
+    <input id="p-old" type="password" autocomplete="current-password" required>
+    <label for="p-new">Yeni şifre</label>
+    <input id="p-new" type="password" autocomplete="new-password" required>
+    <label for="p-new2">Yeni şifre (tekrar)</label>
+    <input id="p-new2" type="password" autocomplete="new-password" required>
+    <button class="btn main wide" type="submit">Kaydet</button>
+    <button class="btn wide" type="button" data-logout>Çıkış yap</button>
+    <div class="error" id="password-error"></div>
+  </form>
+</div>
+
+<!-- The panel -->
+<div id="app" hidden>
+  <header class="top">
+    <div class="top-bar">
+      <div class="top-in">
+        <span class="u-wordmark" aria-label="Uğra">u<span class="g">g</span>ra</span>
+        <div class="name"><span id="biz-name"></span><small id="me-name"></small></div>
+        <select id="branch" aria-label="Şube"></select>
+        <button class="btn small" data-logout aria-label="Çıkış"><i class="bi bi-box-arrow-right"></i><span class="lbl">Çıkış</span></button>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="today"><i class="bi bi-sun"></i>Bugün</button>
+      <button data-tab="calendar"><i class="bi bi-calendar3"></i>Takvim</button>
+      <button data-tab="customers"><i class="bi bi-person-lines-fill"></i>Müşteriler</button>
+      <button data-tab="reports" data-manager><i class="bi bi-bar-chart-line"></i>Raporlar</button>
+      <button data-tab="services"><i class="bi bi-scissors"></i>Hizmetler</button>
+      <button data-tab="hours"><i class="bi bi-clock"></i>Saatler</button>
+      <button data-tab="team" data-manager><i class="bi bi-people"></i>Ekip</button>
+      <button data-tab="share"><i class="bi bi-share"></i>Paylaş</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="tab-today" hidden>
+      <div class="today-head">
+        <div class="grow">
+          <h1 id="today-hello"></h1>
+          <p id="today-date" class="muted"></p>
+        </div>
+        <button class="btn" id="today-walk-in"><i class="bi bi-person-walking"></i>Sıraya ekle</button>
+        <button class="btn main" id="today-new"><i class="bi bi-plus-lg"></i>Yeni randevu</button>
+      </div>
+      <div id="today-next"></div>
+      <div class="stats" id="today-stats"></div>
+      <div class="today-grid">
+        <div class="card">
+          <h2>Bugünün kalanı</h2>
+          <div id="today-list"></div>
+        </div>
+        <div>
+          <div class="card">
+            <h2>Kapıdan gelene boş saatler</h2>
+            <div id="today-free"></div>
+          </div>
+          <div class="card">
+            <h2>Yarın hatırlatılacaklar <small class="muted" id="today-remind-count"></small></h2>
+            <div id="today-remind"></div>
+          </div>
+          <div class="card" id="today-week-card" hidden>
+            <h2>Son 7 gün</h2>
+            <div id="today-week"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-customers" hidden>
+      <div class="card">
+        <div class="bar">
+          <h2 class="grow" style="margin:0">Müşteriler <small class="muted" id="customer-summary"></small></h2>
+        </div>
+        <input type="search" id="customer-search" placeholder="Ad ya da telefon ara" aria-label="Müşteri ara">
+        <div class="chips" id="customer-filters">
+          <button data-filter="all">Hepsi <em></em></button>
+          <button data-filter="regular">Müdavimler <em></em></button>
+          <button data-filter="lapsed">30 gündür gelmeyenler <em></em></button>
+          <button data-filter="fresh">Yeni <em></em></button>
+        </div>
+        <div class="c-list" id="customer-list"></div>
+      </div>
+    </section>
+
+    <section id="tab-reports" hidden>
+      <div class="bar">
+        <h2 class="grow report-title">Raporlar</h2>
+        <div class="chips" id="report-ranges">
+          <button data-range="7">Son 7 gün</button>
+          <button data-range="30">Son 30 gün</button>
+          <button data-range="month">Bu ay</button>
+          <button data-range="lastmonth">Geçen ay</button>
+        </div>
+      </div>
+      <div id="report-body"></div>
+    </section>
+
+    <section id="tab-calendar" hidden>
+      <div class="bar">
+        <button class="btn small" id="day-prev" aria-label="Önceki gün"><i class="bi bi-chevron-left"></i></button>
+        <button class="btn small" id="day-today">Bugün</button>
+        <button class="btn small" id="day-next" aria-label="Sonraki gün"><i class="bi bi-chevron-right"></i></button>
+        <input type="date" id="day-pick" aria-label="Gün">
+        <strong id="day-title"></strong>
+        <span class="grow"></span>
+        <button class="btn" id="walk-in"><i class="bi bi-person-walking"></i>Sıraya ekle</button>
+        <button class="btn main" id="new-appt"><i class="bi bi-plus-lg"></i>Yeni randevu</button>
+      </div>
+      <div class="stats" id="day-stats"></div>
+      <div class="cal-wrap"><div class="cal" id="cal"></div></div>
+      <div class="cancelled-list" id="cancelled"></div>
+    </section>
+
+    <section id="tab-services" hidden>
+      <div class="card">
+        <div class="bar"><h2 class="grow" style="margin:0">Hizmetler</h2><button class="btn main small" id="add-service" data-manager><i class="bi bi-plus-lg"></i>Hizmet ekle</button></div>
+        <div class="list" id="services"></div>
+      </div>
+    </section>
+
+    <section id="tab-hours" hidden>
+      <div class="card">
+        <div class="bar">
+          <h2 class="grow" style="margin:0">Haftalık çalışma saatleri</h2>
+          <select id="hours-staff" style="width:auto" aria-label="Kişi"></select>
+        </div>
+        <div class="week" id="week"></div>
+        <div class="bar" style="margin:14px 0 0"><span class="grow muted" id="hours-note"></span><button class="btn main" id="save-hours">Kaydet</button></div>
+      </div>
+      <div class="card">
+        <div class="bar"><h2 class="grow" style="margin:0">İzinler</h2><button class="btn small" id="add-off"><i class="bi bi-plus-lg"></i>İzin ekle</button></div>
+        <div class="list" id="offs"></div>
+      </div>
+    </section>
+
+    <section id="tab-team" hidden>
+      <div class="card">
+        <div class="bar"><h2 class="grow" style="margin:0">Ekip</h2><button class="btn main small" id="add-staff"><i class="bi bi-person-plus"></i>Kişi ekle</button></div>
+        <div class="list" id="team"></div>
+      </div>
+    </section>
+
+    <section id="tab-share" hidden>
+      <div class="card">
+        <h2>Randevu sayfan</h2>
+        <div class="share">
+          <div class="qr" id="qr"></div>
+          <div>
+            <p style="margin:0">Müşterilerin bu bağlantıdan uygulama indirmeden randevu alır. Instagram profiline, Google işletme sayfana ya da WhatsApp durumuna koyabilirsin. QR kodu yazdırıp tezgaha ya da aynaya yapıştır.</p>
+            <div class="link" id="share-link"></div>
+            <div class="bar" style="justify-content:inherit">
+              <button class="btn main" id="copy-link"><i class="bi bi-link-45deg"></i>Bağlantıyı kopyala</button>
+              <a class="btn" id="wa-link" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i>WhatsApp'ta paylaş</a>
+              <button class="btn" id="qr-download"><i class="bi bi-download"></i>QR indir</button>
+              <a class="btn" id="open-link" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right"></i>Sayfayı aç</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlg"><form class="dlg" id="dlg-body" method="dialog"></form></dialog>
+
+<script src="../config.js?v=2"></script>
+<script src="qrcode.js"></script>
+<script src="panel.js?v=4"></script>
 </body>
 </html>
